@@ -7,7 +7,7 @@ const benefits = [
   "Desconto para assessoria esportiva",
 ];
 
-const UNIT_PRICE = 40;
+const UNIT_PRICE = 1;
 const sizes = ["P", "M", "G", "GG"];
 
 function App() {
