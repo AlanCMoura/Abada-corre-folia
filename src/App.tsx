@@ -69,7 +69,7 @@ function App() {
       <div className="pointer-events-none absolute inset-0 noise opacity-15" />
 
       <header className="relative z-10">
-        <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-8">
+        <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-6 sm:px-6 sm:py-8">
           <div className="flex items-center gap-4">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-amber-400 p-2">
               <img
@@ -91,12 +91,12 @@ function App() {
       </header>
 
       <main className="relative z-10">
-        <section className="mx-auto grid max-w-6xl gap-10 px-6 pb-16 pt-4 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+        <section className="mx-auto grid max-w-6xl gap-10 px-4 pb-12 pt-2 sm:px-6 sm:pb-16 sm:pt-4 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
           <div>
             <span className="inline-flex rounded-full bg-amber-400/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-amber-200">
               21/02 · 15h
             </span>
-            <h1 className="mt-6 font-display text-5xl tracking-wide sm:text-6xl lg:text-7xl">
+            <h1 className="mt-6 font-display text-4xl tracking-wide sm:text-5xl lg:text-7xl">
               Corre Folia – Ressaca de Carnaval
             </h1>
             <p className="mt-4 max-w-xl text-lg text-slate-200 sm:text-xl">
@@ -121,19 +121,19 @@ function App() {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(true)}
-                className="rounded-full bg-amber-400 px-8 py-4 text-base font-semibold text-slate-950 shadow-md transition hover:bg-amber-300"
+                className="w-full rounded-full bg-amber-400 px-8 py-4 text-base font-semibold text-slate-950 shadow-md transition hover:bg-amber-300 sm:w-auto"
               >
                 GARANTA JÁ O SEU
               </button>
               <a
                 href="#beneficios"
-                className="rounded-full border border-amber-300/40 px-8 py-4 text-base font-semibold text-amber-200 transition hover:border-amber-200 hover:text-amber-100"
+                className="w-full rounded-full border border-amber-300/40 px-8 py-4 text-base font-semibold text-amber-200 transition hover:border-amber-200 hover:text-amber-100 sm:w-auto"
               >
                 Veja os benefícios
               </a>
             </div>
 
-            <ul className="mt-8 flex flex-wrap gap-3 text-xs uppercase tracking-[0.22em] text-amber-100">
+            <ul className="mt-8 flex flex-wrap gap-3 text-[11px] uppercase tracking-[0.22em] text-amber-100 sm:text-xs">
               {[
                 "Corrida 5 km",
                 "Bloco no Raízes do Mar",
@@ -161,7 +161,7 @@ function App() {
           </div>
         </section>
 
-        <section className="mx-auto grid max-w-6xl gap-6 px-6 pb-20 lg:grid-cols-3">
+        <section className="mx-auto grid max-w-6xl gap-6 px-4 pb-16 sm:px-6 sm:pb-20 lg:grid-cols-3">
           <div className="rounded-2xl border border-white/5 bg-slate-900/50 p-6 shadow-lg">
             <h3 className="font-display text-2xl tracking-wide text-amber-400">
               Data e horário
@@ -190,8 +190,8 @@ function App() {
           </div>
         </section>
 
-        <section id="beneficios" className="mx-auto max-w-6xl px-6 pb-20">
-          <div className="rounded-3xl border border-amber-400/20 bg-gradient-to-br from-slate-900/80 via-slate-900/70 to-amber-400/10 p-8 shadow-xl lg:p-12">
+        <section id="beneficios" className="mx-auto max-w-6xl px-4 pb-16 sm:px-6 sm:pb-20">
+          <div className="rounded-3xl border border-amber-400/20 bg-gradient-to-br from-slate-900/80 via-slate-900/70 to-amber-400/10 p-6 shadow-xl sm:p-8 lg:p-12">
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
               <div>
                 <h2 className="font-display text-4xl tracking-wide text-amber-400">
@@ -218,7 +218,7 @@ function App() {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(true)}
-                className="rounded-full bg-amber-400 px-10 py-4 text-base font-semibold text-slate-950 shadow-md transition hover:bg-amber-300"
+                className="w-full rounded-full bg-amber-400 px-10 py-4 text-base font-semibold text-slate-950 shadow-md transition hover:bg-amber-300 sm:w-auto"
               >
                 GARANTA JÁ O SEU
               </button>
@@ -228,15 +228,15 @@ function App() {
       </main>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-10">
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto px-4 py-6 sm:items-center sm:py-10">
           <button
             type="button"
             aria-label="Fechar modal"
             className="absolute inset-0 bg-slate-950/80"
             onClick={() => setIsModalOpen(false)}
           />
-          <div className="relative w-full max-w-4xl rounded-3xl border border-white/10 bg-slate-950/95 p-6 shadow-2xl">
-            <div className="flex items-start justify-between gap-4">
+          <div className="relative w-full max-w-4xl rounded-3xl border border-white/10 bg-slate-950/95 p-5 shadow-2xl sm:p-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
                   Garanta já o seu
@@ -270,7 +270,7 @@ function App() {
                   handleBuy();
                 }}
               >
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
                     <p className="text-sm uppercase tracking-[0.24em] text-slate-400">
                       Abadá oficial
@@ -341,7 +341,7 @@ function App() {
                   <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
                     Quantidade
                   </p>
-                  <div className="mt-3 inline-flex items-center rounded-xl border border-white/10 bg-slate-900/60">
+                  <div className="mt-3 flex w-full items-center justify-between rounded-xl border border-white/10 bg-slate-900/60 sm:inline-flex sm:w-auto sm:justify-start">
                     <button
                       type="button"
                       onClick={() =>
