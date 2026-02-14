@@ -8,7 +8,7 @@ const benefits = [
 ];
 
 const UNIT_PRICE = 40;
-const sizes = ["P", "M", "G", "GG"];
+const sizes = ["PP", "P", "M", "G", "GG"];
 
 function App() {
   const [form, setForm] = useState({
