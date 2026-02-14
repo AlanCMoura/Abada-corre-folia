@@ -21,7 +21,7 @@ function App() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
-  async function handleBuy() {
+  function handleBuy() {
     setError("");
     if (!form.name || !form.phone || !form.size || form.quantity < 1) {
       setError("Preencha nome, telefone, tamanho e quantidade.");
@@ -35,30 +35,32 @@ function App() {
     }
 
     setIsSubmitting(true);
-    try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        body: JSON.stringify({
-          action: "create_preference",
-          name: form.name.trim(),
-          phone: form.phone.trim(),
-          size: form.size.trim(),
-          quantity: form.quantity,
-          price: UNIT_PRICE,
-        }),
-      });
 
-      const data = await response.json();
-      if (data?.init_point) {
-        window.location.href = data.init_point;
-      } else {
-        setError("Não foi possível gerar o link de pagamento.");
-      }
-    } catch (err) {
-      setError("Falha ao enviar. Tente novamente.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    const formEl = document.createElement("form");
+    formEl.method = "POST";
+    formEl.action = endpoint;
+    formEl.style.display = "none";
+
+    const payload: Record<string, string> = {
+      action: "create_preference",
+      name: form.name.trim(),
+      phone: form.phone.trim(),
+      size: form.size.trim(),
+      quantity: String(form.quantity),
+      price: String(UNIT_PRICE),
+      redirect: "1",
+    };
+
+    Object.entries(payload).forEach(([key, value]) => {
+      const input = document.createElement("input");
+      input.type = "hidden";
+      input.name = key;
+      input.value = value;
+      formEl.appendChild(input);
+    });
+
+    document.body.appendChild(formEl);
+    formEl.submit();
   }
 
   return (
