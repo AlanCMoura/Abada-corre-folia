@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 const benefits = [
   "Espaço Coca-Cola (Área VIP)",
   "Bar exclusivo",
@@ -5,7 +7,60 @@ const benefits = [
   "Desconto para assessoria esportiva",
 ];
 
+const UNIT_PRICE = 40;
+const sizes = ["P", "M", "G", "GG"];
+
 function App() {
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    size: "",
+    quantity: 1,
+  });
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleBuy() {
+    setError("");
+    if (!form.name || !form.phone || !form.size || form.quantity < 1) {
+      setError("Preencha nome, telefone, tamanho e quantidade.");
+      return;
+    }
+
+    const endpoint = process.env.REACT_APP_WEB_APP_URL;
+    if (!endpoint) {
+      setError("Configure a variável REACT_APP_WEB_APP_URL.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        body: JSON.stringify({
+          action: "create_preference",
+          name: form.name.trim(),
+          phone: form.phone.trim(),
+          size: form.size.trim(),
+          quantity: form.quantity,
+          price: UNIT_PRICE,
+        }),
+      });
+
+      const data = await response.json();
+      if (data?.init_point) {
+        window.location.href = data.init_point;
+      } else {
+        setError("Não foi possível gerar o link de pagamento.");
+      }
+    } catch (err) {
+      setError("Falha ao enviar. Tente novamente.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   return (
     <div className="relative min-h-screen overflow-hidden bg-slate-950 text-white">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(251,191,36,0.16),_transparent_55%)]" />
@@ -61,12 +116,13 @@ function App() {
             </div>
 
             <div className="mt-8 flex flex-wrap gap-4">
-              <a
-                href="#beneficios"
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(true)}
                 className="rounded-full bg-amber-400 px-8 py-4 text-base font-semibold text-slate-950 shadow-md transition hover:bg-amber-300"
               >
                 GARANTA JÁ O SEU
-              </a>
+              </button>
               <a
                 href="#beneficios"
                 className="rounded-full border border-amber-300/40 px-8 py-4 text-base font-semibold text-amber-200 transition hover:border-amber-200 hover:text-amber-100"
@@ -156,17 +212,186 @@ function App() {
               ))}
             </div>
 
-            <div className="mt-8 flex justify-center">
-              <a
-                href="#beneficios"
-                className="rounded-full bg-amber-400 px-8 py-4 text-base font-semibold text-slate-950 shadow-md transition hover:bg-amber-300"
+            <div className="mt-10 flex justify-center">
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(true)}
+                className="rounded-full bg-amber-400 px-10 py-4 text-base font-semibold text-slate-950 shadow-md transition hover:bg-amber-300"
               >
                 GARANTA JÁ O SEU
-              </a>
+              </button>
             </div>
           </div>
         </section>
       </main>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-10">
+          <button
+            type="button"
+            aria-label="Fechar modal"
+            className="absolute inset-0 bg-slate-950/80"
+            onClick={() => setIsModalOpen(false)}
+          />
+          <div className="relative w-full max-w-4xl rounded-3xl border border-white/10 bg-slate-950/95 p-6 shadow-2xl">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.28em] text-slate-400">
+                  Garanta já o seu
+                </p>
+                <h3 className="mt-2 font-display text-3xl tracking-wide text-amber-400">
+                  Abadá Corre Folia
+                </h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="rounded-full border border-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-300 transition hover:border-white/30"
+              >
+                Fechar
+              </button>
+            </div>
+
+            <div className="mt-6 grid gap-6 lg:grid-cols-[1.05fr_1fr] lg:items-start">
+              <div className="relative overflow-hidden rounded-3xl bg-slate-900/60 p-4 shadow-xl">
+                <img
+                  src="/ABADA VENDA.png"
+                  alt="Abadá oficial do Corre Folia"
+                  className="h-full w-full rounded-2xl object-cover"
+                />
+              </div>
+
+              <form
+                className="grid gap-4"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  handleBuy();
+                }}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm uppercase tracking-[0.24em] text-slate-400">
+                      Abadá oficial
+                    </p>
+                    <h4 className="mt-2 text-2xl font-semibold text-white">
+                      R$ {UNIT_PRICE.toFixed(2).replace(".", ",")}
+                    </h4>
+                  </div>
+                  <div className="rounded-full border border-amber-300/40 bg-amber-400/10 px-4 py-2 text-xs uppercase tracking-[0.22em] text-amber-100">
+                    Pré-venda
+                  </div>
+                </div>
+
+                <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.2em] text-slate-400">
+                  Nome completo
+                  <input
+                    type="text"
+                    value={form.name}
+                    onChange={(event) =>
+                      setForm((prev) => ({ ...prev, name: event.target.value }))
+                    }
+                    className="rounded-xl border border-white/10 bg-slate-900/60 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300"
+                    placeholder="Seu nome"
+                  />
+                </label>
+
+                <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.2em] text-slate-400">
+                  Telefone
+                  <input
+                    type="tel"
+                    value={form.phone}
+                    onChange={(event) =>
+                      setForm((prev) => ({ ...prev, phone: event.target.value }))
+                    }
+                    className="rounded-xl border border-white/10 bg-slate-900/60 px-4 py-3 text-sm text-white outline-none transition focus:border-amber-300"
+                    placeholder="(00) 00000-0000"
+                  />
+                </label>
+
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                    Tamanho
+                  </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {sizes.map((size) => {
+                      const isActive = form.size === size;
+                      return (
+                        <button
+                          key={size}
+                          type="button"
+                          onClick={() =>
+                            setForm((prev) => ({ ...prev, size }))
+                          }
+                          className={`h-10 w-12 rounded-lg border text-sm font-semibold uppercase transition ${
+                            isActive
+                              ? "border-amber-300 bg-amber-400/20 text-amber-100"
+                              : "border-white/10 bg-slate-900/60 text-slate-300 hover:border-amber-300/50"
+                          }`}
+                        >
+                          {size}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                    Quantidade
+                  </p>
+                  <div className="mt-3 inline-flex items-center rounded-xl border border-white/10 bg-slate-900/60">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setForm((prev) => ({
+                          ...prev,
+                          quantity: Math.max(1, prev.quantity - 1),
+                        }))
+                      }
+                      className="px-4 py-2 text-lg text-slate-300 transition hover:text-white"
+                    >
+                      -
+                    </button>
+                    <span className="min-w-[48px] text-center text-sm font-semibold text-white">
+                      {form.quantity}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setForm((prev) => ({
+                          ...prev,
+                          quantity: prev.quantity + 1,
+                        }))
+                      }
+                      className="px-4 py-2 text-lg text-slate-300 transition hover:text-white"
+                    >
+                      +
+                    </button>
+                  </div>
+                  <p className="mt-2 text-xs text-slate-400">
+                    Total: R${" "}
+                    {(UNIT_PRICE * form.quantity)
+                      .toFixed(2)
+                      .replace(".", ",")}
+                  </p>
+                </div>
+
+                {error && (
+                  <p className="text-sm font-semibold text-amber-200">{error}</p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="mt-2 w-full rounded-full bg-amber-400 px-8 py-4 text-base font-semibold text-slate-950 shadow-md transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {isSubmitting ? "GERANDO LINK..." : "GARANTA JÁ O SEU"}
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
