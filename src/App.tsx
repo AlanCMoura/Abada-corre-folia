@@ -17,14 +17,65 @@ function App() {
     size: "",
     quantity: 1,
   });
+  const [cartItems, setCartItems] = useState<
+    { size: string; quantity: number }[]
+  >([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
 
+  const totalQuantity = cartItems.reduce(
+    (total, item) => total + item.quantity,
+    0
+  );
+  const totalPrice = totalQuantity * UNIT_PRICE;
+  const cartSummary = cartItems
+    .map((item) => `${item.size} x${item.quantity}`)
+    .join(", ");
+
+  function addToCart() {
+    setError("");
+    if (!form.size) {
+      setError("Selecione um tamanho.");
+      return;
+    }
+    if (!form.quantity || form.quantity < 1) {
+      setError("Quantidade inválida.");
+      return;
+    }
+
+    setCartItems((prev) => {
+      const existing = prev.find((item) => item.size === form.size);
+      if (existing) {
+        return prev.map((item) =>
+          item.size === form.size
+            ? { ...item, quantity: item.quantity + form.quantity }
+            : item
+        );
+      }
+      return [...prev, { size: form.size, quantity: form.quantity }];
+    });
+  }
+
+  function updateCartQuantity(size: string, quantity: number) {
+    setCartItems((prev) => {
+      if (quantity < 1) {
+        return prev.filter((item) => item.size !== size);
+      }
+      return prev.map((item) =>
+        item.size === size ? { ...item, quantity } : item
+      );
+    });
+  }
+
   function handleBuy() {
     setError("");
-    if (!form.name || !form.phone || !form.size || form.quantity < 1) {
-      setError("Preencha nome, telefone, tamanho e quantidade.");
+    if (!form.name || !form.phone) {
+      setError("Preencha nome e telefone.");
+      return;
+    }
+    if (cartItems.length === 0) {
+      setError("Adicione pelo menos um tamanho ao carrinho.");
       return;
     }
 
@@ -45,8 +96,8 @@ function App() {
       action: "create_preference",
       name: form.name.trim(),
       phone: form.phone.trim(),
-      size: form.size.trim(),
-      quantity: String(form.quantity),
+      size: cartSummary || form.size.trim(),
+      quantity: String(totalQuantity),
       price: String(UNIT_PRICE),
       redirect: "1",
     };
@@ -371,11 +422,83 @@ function App() {
                     </button>
                   </div>
                   <p className="mt-2 text-xs text-slate-400">
-                    Total: R${" "}
+                    Subtotal selecionado: R${" "}
                     {(UNIT_PRICE * form.quantity)
                       .toFixed(2)
                       .replace(".", ",")}
                   </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={addToCart}
+                  className="w-full rounded-full border border-amber-300/50 px-8 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-amber-200 transition hover:border-amber-200 hover:text-amber-100"
+                >
+                  Adicionar ao carrinho
+                </button>
+
+                <div className="rounded-2xl border border-white/10 bg-slate-900/50 p-4">
+                  <div className="flex items-center justify-between">
+                    <p className="text-xs uppercase tracking-[0.2em] text-slate-400">
+                      Carrinho
+                    </p>
+                    <p className="text-xs uppercase tracking-[0.2em] text-amber-200">
+                      {totalQuantity} item(ns)
+                    </p>
+                  </div>
+                  {cartItems.length === 0 ? (
+                    <p className="mt-3 text-sm text-slate-400">
+                      Nenhum tamanho adicionado ainda.
+                    </p>
+                  ) : (
+                    <div className="mt-3 grid gap-3">
+                      {cartItems.map((item) => (
+                        <div
+                          key={item.size}
+                          className="flex items-center justify-between rounded-xl border border-white/5 bg-slate-950/40 px-3 py-2 text-sm"
+                        >
+                          <span className="font-semibold text-white">
+                            Abadá Corre Folia (Tamanho {item.size})
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                updateCartQuantity(
+                                  item.size,
+                                  item.quantity - 1
+                                )
+                              }
+                              className="h-7 w-7 rounded-full border border-white/10 text-slate-300 transition hover:text-white"
+                            >
+                              -
+                            </button>
+                            <span className="min-w-[24px] text-center text-white">
+                              {item.quantity}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                updateCartQuantity(
+                                  item.size,
+                                  item.quantity + 1
+                                )
+                              }
+                              className="h-7 w-7 rounded-full border border-white/10 text-slate-300 transition hover:text-white"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <div className="mt-4 flex items-center justify-between text-sm">
+                    <span className="text-slate-400">Total do carrinho</span>
+                    <span className="font-semibold text-white">
+                      R$ {totalPrice.toFixed(2).replace(".", ",")}
+                    </span>
+                  </div>
                 </div>
 
                 {error && (
@@ -384,10 +507,10 @@ function App() {
 
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || cartItems.length === 0}
                   className="mt-2 w-full rounded-full bg-amber-400 px-8 py-4 text-base font-semibold text-slate-950 shadow-md transition hover:bg-amber-300 disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  {isSubmitting ? "GERANDO LINK..." : "GARANTA JÁ O SEU"}
+                  {isSubmitting ? "GERANDO LINK..." : "FINALIZAR COMPRA"}
                 </button>
               </form>
             </div>
