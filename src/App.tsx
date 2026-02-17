@@ -9,6 +9,11 @@ const benefits = [
 
 const UNIT_PRICE = 45;
 const sizes = ["PP", "P", "M", "G", "GG"];
+const disabledSizes = new Set(["P"]);
+const WHATSAPP_MESSAGE = "Olá, quero garantir meu Abada do Corre Folia!";
+const WHATSAPP_LINK =
+  "https://wa.me/5513955518906?text=" +
+  encodeURIComponent(WHATSAPP_MESSAGE);
 
 function App() {
   const [form, setForm] = useState({
@@ -334,6 +339,17 @@ function App() {
                     1º Lote Oficial
                   </div>
                 </div>
+                <div className="rounded-2xl border border-amber-300/30 bg-amber-400/10 px-4 py-3 text-xs text-amber-100">
+                  Pagamento no cartão? Chame no WhatsApp:
+                  <a
+                    href={WHATSAPP_LINK}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full border border-amber-300/40 bg-amber-400 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-slate-950 transition hover:bg-amber-300 sm:w-auto"
+                  >
+                    Chame no WhatsApp
+                  </a>
+                </div>
 
                 <label className="flex flex-col gap-2 text-xs uppercase tracking-[0.2em] text-slate-400">
                   Nome completo
@@ -368,15 +384,19 @@ function App() {
                   <div className="mt-3 flex flex-wrap gap-2">
                     {sizes.map((size) => {
                       const isActive = form.size === size;
+                      const isDisabled = disabledSizes.has(size);
                       return (
                         <button
                           key={size}
                           type="button"
+                          disabled={isDisabled}
                           onClick={() =>
                             setForm((prev) => ({ ...prev, size }))
                           }
                           className={`h-10 w-12 rounded-lg border text-sm font-semibold uppercase transition ${
-                            isActive
+                            isDisabled
+                              ? "cursor-not-allowed border-white/5 bg-slate-900/40 text-slate-500"
+                              : isActive
                               ? "border-amber-300 bg-amber-400/20 text-amber-100"
                               : "border-white/10 bg-slate-900/60 text-slate-300 hover:border-amber-300/50"
                           }`}
