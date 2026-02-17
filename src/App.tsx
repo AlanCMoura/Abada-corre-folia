@@ -7,7 +7,7 @@ const benefits = [
   "Desconto para assessoria esportiva",
 ];
 
-const UNIT_PRICE = 40;
+const UNIT_PRICE = 45;
 const sizes = ["PP", "P", "M", "G", "GG"];
 
 function App() {
@@ -331,7 +331,7 @@ function App() {
                     </h4>
                   </div>
                   <div className="rounded-full border border-amber-300/40 bg-amber-400/10 px-4 py-2 text-xs uppercase tracking-[0.22em] text-amber-100">
-                    Pré-venda
+                    1º Lote Oficial
                   </div>
                 </div>
 
